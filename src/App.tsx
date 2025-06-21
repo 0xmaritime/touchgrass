@@ -6,13 +6,11 @@ import { Header } from './components/layout/Header';
 import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { Leaderboards } from './pages/Leaderboards';
+import ChallengeDetail from './pages/ChallengeDetail';
+import UserProfile from './pages/UserProfile';
+import Settings from './pages/Settings';
 import { useWallet } from './context/WalletContext';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // This would be inside the providers, so we can't use the hook here
-  // Instead, we'll handle the redirect in the component itself
-  return <>{children}</>;
-};
 
 const AppContent: React.FC = () => {
   const { isConnected } = useWallet();
@@ -31,6 +29,18 @@ const AppContent: React.FC = () => {
           element={isConnected ? <Dashboard /> : <Navigate to="/" replace />} 
         />
         <Route path="/leaderboards" element={<Leaderboards />} />
+        <Route
+          path="/challenge/:id"
+          element={isConnected ? <ChallengeDetail /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/profile/:username"
+          element={isConnected ? <UserProfile /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/settings"
+          element={isConnected ? <Settings /> : <Navigate to="/" replace />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

@@ -2,16 +2,9 @@ import React, { createContext, useContext, useState } from 'react';
 import { User, UserChallenge } from '../types';
 import { mockUsers } from '../data/mockUsers';
 
-interface UserContextType {
-  currentUser: User | null;
-  userChallenges: UserChallenge[];
-  followUser: (userId: string) => void;
-  unfollowUser: (userId: string) => void;
-  joinChallenge: (challengeId: string, stakeAmount: number, stakeCurrency: string) => void;
-  completeChallenge: (challengeId: string) => void;
-}
+import { UserContextType } from '../types/UserContextTypes';
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const useUser = () => {
   const context = useContext(UserContext);
@@ -22,7 +15,7 @@ export const useUser = () => {
 };
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser] = useState<User | null>(mockUsers[0]); // Mock logged-in user
+  const [currentUser, setCurrentUser] = useState<User | null>(mockUsers[0]); // Mock logged-in user
   const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([
     {
       challengeId: '1',
@@ -78,6 +71,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const updateUserSettings = (settings: Partial<User>) => {
+    if (currentUser) {
+      setCurrentUser(prev => prev ? { ...prev, ...settings } : null);
+    }
+  };
+
   return (
     <UserContext.Provider value={{
       currentUser,
@@ -86,6 +85,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unfollowUser,
       joinChallenge,
       completeChallenge,
+      updateUserSettings,
     }}>
       {children}
     </UserContext.Provider>

@@ -10,13 +10,23 @@ import { useUser } from '../context/UserContext';
 import { mockChallenges } from '../data/mockChallenges';
 import { mockActivities } from '../data/mockActivities';
 import { mockUsers } from '../data/mockUsers';
-import { formatCurrency, formatUSD } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 import { Challenge } from '../types';
+import ChallengeCreationForm from '../components/challenges/ChallengeCreationForm';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, userChallenges } = useUser();
   const [selectedTab, setSelectedTab] = useState<'active' | 'completed' | 'all'>('active');
+  const [showCreateChallengeModal, setShowCreateChallengeModal] = useState(false);
+
+  const handleChallengeCreate = (newChallenge: Challenge) => {
+    // In a real app, you would send this to your backend
+    console.log('New Challenge Created:', newChallenge);
+    // For now, we'll just close the modal
+    setShowCreateChallengeModal(false);
+    // Optionally, refresh challenges or add to a local state
+  };
 
   if (!currentUser) {
     return (
@@ -42,7 +52,6 @@ export const Dashboard: React.FC = () => {
   };
 
   const totalActiveStake = userActiveChallenges.reduce((sum, uc) => sum + uc.stakeAmount, 0);
-  const totalEarnings = userCompletedChallenges.reduce((sum, uc) => sum + (uc.payout || 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,13 +69,27 @@ export const Dashboard: React.FC = () => {
             </div>
             <Button
               icon={Plus}
-              onClick={() => navigate('/create-challenge')}
+              onClick={() => setShowCreateChallengeModal(true)}
               className="hidden sm:flex"
             >
               Create Challenge
             </Button>
           </div>
         </div>
+
+        {showCreateChallengeModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+            <div className="relative p-8 bg-white w-full max-w-2xl mx-auto rounded-lg shadow-lg">
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowCreateChallengeModal(false)}
+              >
+                &times;
+              </button>
+              <ChallengeCreationForm onChallengeCreate={handleChallengeCreate} />
+            </div>
+          </div>
+        )}
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
